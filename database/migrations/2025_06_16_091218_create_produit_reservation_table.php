@@ -17,6 +17,7 @@ return new class extends Migration
 
             $table->primary(['produit_id', 'reservation_id']);
             $table->integer('quantity');
+            $table->string('prescription_file')->nullable(); // pour la soumission du formulaire
             $table->timestamps();
 
             $table->foreign('produit_id')->references('id')->on('produits')->onDelete('cascade');

@@ -4,33 +4,25 @@
 
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #f3f6f9;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #f3f6f9 60%, #e0f7fa 100%);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 150vh;
   margin: 0;
-}
-
-.register-container {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 800px;
 }
 
 h2 {
   text-align: center;
   color: #2a9d8f;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  margin-top: 0.5rem;
 }
 
 form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
 }
 
 .form-group {
@@ -99,3 +91,94 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+.register-container {
+  max-width: 600px;
+  width: 100%;
+  padding: 2.5rem 2rem;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(44, 62, 80, 0.12);
+}
+
+.form-section {
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #2d6cdf;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  background: #f9f9f9;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #2d6cdf;
+  outline: none;
+  background: #fff;
+}
+
+.form-text {
+  font-size: 0.92rem;
+  color: #888;
+  margin-top: 2px;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.92rem;
+  margin-top: 2px;
+}
+
+.btn-register {
+  background:  #2a9d8f;
+  font-size: 1.15rem;
+  font-weight: bold;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-register:hover {
+  background: linear-gradient(90deg, #1b4fa0);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.links {
+  text-align: center;
+  margin-top: 18px;
+}
+

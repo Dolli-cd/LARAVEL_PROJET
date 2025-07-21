@@ -19,9 +19,8 @@ class Commande extends Model
     public function getStatusCmdAttribute(){
         return match($this->status){
             'confirmed'=>'Confirmée',
-            'pending'=>'En attente',
-            'delivered'=>'Livrée',
-            'cancelled'=>'Annulée',
+            'pending'=>'En attente',// delivré a été supprimé
+            'cancelled'=>'Annulée',// a revoir
             default => 'Non spécifié'
         };
     }
@@ -31,6 +30,8 @@ class Commande extends Model
     public function produits(){
         return $this->belongsToMany(Produit::class)
         ->withPivot('quantity')
+        //récemment ajouté ordonnance pour le téléchargement des fichiers
+        ->withPivot('prescription_file')
         ->withTimestamps();
     }
 

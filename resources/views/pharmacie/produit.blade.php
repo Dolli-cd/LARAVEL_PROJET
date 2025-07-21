@@ -1,95 +1,12 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Produit Gestion - PharmFind</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-        }
-        .navbar {
-            background: linear-gradient(90deg, #007bff, #0056b3);
-            padding: 10px 20px;
-        }
-        .navbar-brand {
-            color: white !important;
-            font-weight: bold;
-            font-size: 1.5rem;
-        }
-        .navbar-brand:hover {
-            color: #e9ecef !important;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        .btn-danger {
-            background-color: #dc3545;
-            border-color: #dc3545;
-        }
-        .btn-danger:hover {
-            background-color: #c82333;
-            border-color: #c82333;
-        }
-        .search-bar {
-            transition: all 0.3s ease;
-        }
-        .search-bar:focus-within {
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
-        .product-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            margin-bottom: 15px;
-            transition: transform 0.2s;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-        }
-        .table-responsive {
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 10px;
-            }
-            .navbar-brand {
-                font-size: 1.2rem;
-            }
-            .search-bar {
-                margin-bottom: 10px;
-            }
-            .btn-group {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-    </style>
-</head>
-<body>
+@extends('layouts.accueil')
+
+@section('title', 'Dashboard Pharmacie ')
+@section('page-title', 'Tableau de bord ')
+
+@section('content')
+<div class="container-fluid mt-4">
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('wel') }}">PharmFind <i class="fas fa-pills"></i></a>
-            <form id="logout" action="{{ route('logout') }}" method="POST" class="d-flex">
-                @csrf
-                <button type="submit" class="btn btn-danger">Déconnexion <i class="fas fa-sign-out-alt"></i></button>
-            </form>
-        </div>
-    </nav>
-
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
             <form id="searchForm" class="search-bar w-50">
@@ -98,7 +15,7 @@
                     <button type="button" class="btn btn-outline-secondary"><i class="fas fa-search"></i></button>
                 </div>
             </form>
-            <a href="{{ route('ajouter_produit') }}" class="btn btn-primary btn-sm mt-2"><i class="fas fa-plus"></i> Ajouter un produit</a>
+            <a  class="btn btn-primary btn-sm mt-fas fa-plus"data-bs-toggle="modal" data-bs-target="#ajoutProduitModal "></i> Ajouter un produit</a>
         </div>
 
         <hr>
@@ -107,81 +24,181 @@
             <button id="deleteSelected" class="btn btn-danger btn-sm" disabled><i class="fas fa-trash"></i> Supprimer la sélection</button>
         </div>
 
-        <div id="tableproduit">
+        <div id="tableproduit" class="table-container">
             @include('pharmacie.search', ['produits' => $produits])
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Recherche en temps réel
+<!-- Fenêtre modale -->
+<div class="modal fade" id="ajoutProduitModal" tabindex="-1" aria-labelledby="ajoutProduitLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="ajoutProduitLabel">Ajouter un produit pour {{ auth()->user()->pharmacie->name ?? 'Votre Pharmacie' }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ route('ajouter_produit_traitement') }}" method="POST" id="addProductForm" enctype="multipart/form-data">
+          @csrf
+          <div class="mb-3">
+            <label for="name" class="form-label">Nom du produit <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="code" class="form-label">Code <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="code" name="code" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="type" class="form-label">Type <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="type" name="type" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="categorie_id" class="form-label">Catégorie <span class="text-danger">*</span></label>
+            <select class="form-control" id="categorie_id" name="categorie_id" required>
+              <option value="">Sélectionner une catégorie</option>
+                          @foreach(\App\Models\Categorie::all() as $categorie)
+                <option value="{{ $categorie->id }}">{{ $categorie->name}}</option>
+            @endforeach
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="file" class="form-label">Image du produit <span class="text-danger">*</span></label>
+            <input type="file" class="form-control" id="file" name="file" accept="image/*" required>
+            <div id="preview-container" class="mt-2">
+                <img id="image-preview" src="#" alt="Aperçu de l'image" style="display: none; max-width: 200px; max-height: 200px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);" />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="price" class="form-label">Prix <span class="text-danger">*</span></label>
+            <input type="number" step="0.50" class="form-control" id="price" name="price" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Quantité <span class="text-danger">*</span></label>
+            <input type="integer" step="1" class="form-control" id="quantity" name="quantity" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="status" class="form-label">Statut <span class="text-danger">*</span></label>
+            <select class="form-control" id="status" name="status" required>
+              <option value="available">Disponible</option>
+              <option value="unavailable">Indisponible</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="comment" class="form-label">Commentaire</label>
+            <input type="text" class="form-control" id="comment" name="comment">
+          </div>
+
+          <div class="mb-3">
+            <label for="prescription" class="form-label">Nécessite une ordonnance ?</label>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="prescription" name="prescription" value="1">
+              <label class="form-check-label" for="prescription">Oui</label>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+    jQuery(document).ready(function() {
+        // Fonction pour rebinder les événements des checkboxes
+        function bindCheckboxEvents() {
+            // Checkbox "Sélectionner tout"
+            jQuery('#selectAll').off('change').on('change', function() {
+                jQuery('.selectproduit').prop('checked', jQuery(this).is(':checked'));
+                toggleDeleteButton();
+            });
+
+            // Checkboxes individuelles
+            jQuery(document).off('change', '.selectproduit').on('change', '.selectproduit', function() {
+                const totalCheckboxes = jQuery('.selectproduit').length;
+                const checkedCheckboxes = jQuery('.selectproduit:checked').length;
+                
+                jQuery('#selectAll').prop('checked', totalCheckboxes === checkedCheckboxes);
+                toggleDeleteButton();
+            });
+        }
+
+        // Fonction pour activer/désactiver le bouton de suppression
+        function toggleDeleteButton() {
+            const selectedCount = jQuery('.selectproduit:checked').length;
+            jQuery('#deleteSelected').prop('disabled', selectedCount === 0);
+        }
+
+        // Recherche dynamique
         let debounceTimer;
-        $('#searchInput').on('input', function () {
+        jQuery('#searchInput').on('input', function () {
             clearTimeout(debounceTimer);
-            const query = $(this).val().trim();
+            const query = jQuery(this).val().trim();
 
             debounceTimer = setTimeout(() => {
-                $.ajax({
+                jQuery.ajax({
                     url: "{{ route('search') }}",
                     type: 'GET',
                     data: { search: query },
                     success: function (data) {
-                        $('#tableproduit').html(data);
+                        jQuery('#tableproduit').html(data);
+                        // Rebinder les événements après la recherche
+                        bindCheckboxEvents();
+                        toggleDeleteButton();
                     },
                     error: function () {
                         alert("Erreur lors de la recherche.");
                     }
                 });
-            }, 300); // Ajusté à 300ms pour une meilleure réactivité
+            }, 300);
         });
 
-        // Gestion des checkboxes
-        $(document).ready(function () {
-            $('#selectAll').on('change', function () {
-                $('.selectproduit').prop('checked', $(this).is(':checked'));
-                toggleDeleteButton();
-            });
+        // Suppression multiple
+        jQuery('#deleteSelected').on('click', function () {
+            const ids = jQuery('.selectproduit:checked').map(function () {
+                return jQuery(this).val();
+            }).get();
 
-            $(document).on('change', '.selectproduit', function () {
-                $('#selectAll').prop('checked', $('.selectproduit:checked').length === $('.selectproduit').length);
-                toggleDeleteButton();
-            });
+            if (ids.length === 0) return;
 
-            function toggleDeleteButton() {
-                const selectedCount = $('.selectproduit:checked').length;
-                $('#deleteSelected').prop('disabled', selectedCount === 0);
+            if (confirm("Voulez-vous vraiment supprimer les produits sélectionnés ?")) {
+                jQuery.ajax({
+                    url: "{{ route('produit.deleteMultiple') }}",
+                    type: 'POST',
+                    data: {
+                        ids: ids,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function (data) {
+                        jQuery('#tableproduit').html(data);
+                        jQuery('#selectAll').prop('checked', false);
+                        // Rebinder les événements après la suppression
+                        bindCheckboxEvents();
+                        toggleDeleteButton();
+                        alert('Les produits ont bien été supprimés.');
+                    },
+                    error: function () {
+                        alert('Erreur lors de la suppression.');
+                    }
+                });
             }
-
-            // Suppression multiple
-            $('#deleteSelected').on('click', function () {
-                const ids = $('.selectproduit:checked').map(function () {
-                    return $(this).val();
-                }).get();
-
-                if (ids.length === 0) return;
-
-                if (confirm("Voulez-vous vraiment supprimer les produits sélectionnés ?")) {
-                    $.ajax({
-                        url: "{{ route('produit.deleteMultiple') }}",
-                        type: 'POST',
-                        data: {
-                            ids: ids,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function (data) {
-                            $('#tableproduit').html(data);
-                            $('#selectAll').prop('checked', false);
-                            toggleDeleteButton();
-                            alert('Les produits ont bien été supprimés.');
-                        },
-                        error: function () {
-                            alert('Erreur lors de la suppression.');
-                        }
-                    });
-                }
-            });
         });
-    </script>
-</body>
-</html>
+
+        // Initialisation au chargement de la page
+        bindCheckboxEvents();
+        toggleDeleteButton();
+    });
+</script>
+    @stack('scripts')
+@endsection

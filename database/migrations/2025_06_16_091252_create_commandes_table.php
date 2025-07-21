@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
             $table->foreignId('pharmacie_id')->constrained('pharmacies')->onDelete('cascade');
-            $table->enum('status',['pending','delivered','cancelled','confirmed']);
+            $table->enum('status',['pending','cancelled','confirmed']);
             $table->datetime('order_date');
             $table->timestamps();
         });

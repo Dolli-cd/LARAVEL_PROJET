@@ -7,8 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Paiement extends Model
 {
     protected $fillable=[
-        'client_id',
-        'pharmacie_id',
         'reservation_id',
         'commande_id',
         'amount',
@@ -29,15 +27,8 @@ class Paiement extends Model
         };
     }
 
-     //Un paiement est fait par un client  à une pharmacie sur une commande ou  une réservation
-    public function client()
-    {
-        return $this->belongsTo(Client::class);
-    }
-    public function pharmacie()
-    {
-        return $this->belongsTo(Pharmacie::class);
-    }
+     //Un paiement est fait pour  une commande ou  une réservation
+  
     public function commande()
     {
         return $this->belongsTo(Commande::class);

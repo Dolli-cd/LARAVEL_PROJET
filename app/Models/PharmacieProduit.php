@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Pivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+
 
 class PharmacieProduit extends Pivot
 {
@@ -13,6 +14,8 @@ class PharmacieProduit extends Pivot
         'pharmacie_id',
         'produit_id',
         'status',
+        'price',
+        'quantity',
         'comment',
     ];
     protected $appends = ['status_prod'];

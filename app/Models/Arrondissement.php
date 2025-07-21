@@ -10,11 +10,10 @@ class Arrondissement extends Model
         'commune_id',
         'name',
     ];
-    
-     public function quartiers(){
-        return $this->hasMany(Quartier::class);
-    }
      public function commune(){
         return $this->belongsTo(Commune::class);
+    }
+    public function geolocalisations(){
+        return $this->hasMany(Geolocalisation::class);
     }
 }

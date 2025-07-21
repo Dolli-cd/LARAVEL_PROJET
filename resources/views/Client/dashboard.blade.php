@@ -1,45 +1,133 @@
-@extends('layouts.app')
-@section('title', 'Dashboard Client')
-@section('page-title')
-    <h1>Votre Espace, {{ $data['name'] }} !</h1>
-@endsection
+@extends('layouts.accueil')
+
+@section('title', 'Tableau de bord')
+            
 @section('content')
-<div class="container">
-@section('sidebar')
-<div class="p-3">
-    <a href="{{ route('wel') }}" class="nav-link {{ request()->routeIs('wel') ? 'active' : '' }}">
-        <i class="fas fa-home-alt me-2"></i>Home
-    </a>
-    <a href="{{ route('wel') }}" class="nav-link {{ request()->routeIs('liste_produit') ? 'active' : '' }}">
-        <i class="fas fa-calendar-check me-2"></i>Réservations
-    </a>
-    <a href="{{ route('wel') }}" class="nav-link {{ request()->routeIs('wel') ? 'active' : '' }}">
-        <i class="fas fa-shopping-cart me-2"></i>Commandes
-    </a>
-    <a href="{{ route('wel') }}" class="nav-link {{ request()->routeIs('wel') ? 'active' : '' }}">
-        <i class="fas fa-history me-2"></i>Historique
-    </a>
-    <a href="{{ route('wel') }}" class="nav-link {{ request()->routeIs('wel') ? 'active' : '' }}">
-        <i class="fas fa-bell me-2"></i>Notifications
-    </a>
-    <a href="{{ route('logout') }}" class="nav-link text-danger" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
-    </a>
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
-</div>
-@endsection
+@if (Auth::check () ||  Auth::user()->role==='client')
 
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Médicaments Populaires</h2>
+                {{-- <a href="#" class="section-link">Voir plus →</a> --}}
+            </div>
+            <div class="products-grid">
+                @forelse($produits as $produit)
+                    <div class="product-card">
+                        <div class="product-image">
+                            <img src="{{ asset('storage/' . $produit->file) }}" alt="{{ $produit->name }}">
+                        </div>
+                        <div class="product-info">
+                            <div class="product-pharmacy">
+                                @if($produit->pharmacies->count())
+                                    {{ $produit->pharmacies->first()->user->name ?? 'Pharmacie inconnue' }}
+                                @else
+                                    Pharmacie inconnue
+                                @endif
+                            </div>
+                            <div class="product-name">{{ $produit->name }}</div>
+                            <div class="product-location">
+                                @if($produit->pharmacies->count())
+                                    {{ $produit->pharmacies->first()->user->address ?? '' }}
+                                @endif
+                            </div>
+                            <div class="product-prescription">
+                                {{ $produit->prescription ? 'Ordonnance requise' : 'Sans ordonnance' }}
+                            </div>
+                            <div class="product-footer">
+                                <div class="product-price">
+                                    @if($produit->pharmacies->count())
+                                        {{ number_format($produit->pharmacies->first()->pivot->price ?? 0, 0, ',', ' ') }} FCFA
+                                    @else
+                                        N/A
+                                    @endif
+                                </div>
+                                <div class="product-status">
+                                    @if($produit->pharmacies->count())
+                                        {{ ucfirst($produit->pharmacies->first()->pivot->status_prod ?? 'indisponible') }}
+                                    @else
+                                        Indisponible
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @foreach($produit->pharmacies as $pharmacie)
+                            <form action="{{ route('panier.ajouter') }}" method="POST" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $produit->id }}">
+                                <input type="hidden" name="pharmacie_id" value="{{ $pharmacie->id }}">
+                                <button type="submit" class="product-btn">
+                                    <i class="fas fa-cart-plus"></i> Ajouter au panier
+                                </button>
+                            </form>
+                        @endforeach
+                    </div>
+                @empty
+                    <div class="alert alert-warning">Aucun médicament trouvé.</div>
+                @endforelse
+            </div>
+        </div>
+    </section>          
+    <!-- Product Showcase (Promo ou Produit Vedette) -->
+  
 
-    {{-- Si tu as des commandes liées au client, tu peux les afficher ici --}}
-    {{-- 
-    <p>Total commandes : {{ $data['total_commandes'] }}</p>
-    @if($data['derniere_commande'])
-        <p>Dernière commande : {{ $data['derniere_commande']->created_at->format('d/m/Y') }}</p>
-    @else
-        <p>Aucune commande enregistrée.</p>
+        </div>
+    </section>
+    <!-- Pharmacies proches -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Pharmacies proches</h2>
+                <a href="#" class="section-link">Voir plus →</a>
+            </div>
+            <div class="products-grid">
+                <div class="pharmacy-card">
+                    <div class="pharmacy-image"></div>
+                    <div class="pharmacy-info">
+                        <div class="pharmacy-rating">★★★★★</div>
+                        <div class="pharmacy-badge">De garde</div>
+                        <div class="pharmacy-name">Pharmacie Étoile</div>
+                        <div class="pharmacy-hours">Ouverte • Ferme à 22h</div>
+                        <div class="pharmacy-location">Cotonou - Zogbo</div>
+                        <button class="pharmacy-btn">Voir les détails →</button>
+                    </div>
+                </div>
+                <div class="pharmacy-card">
+                    <div class="pharmacy-image"></div>
+                    <div class="pharmacy-info">
+                        <div class="pharmacy-rating">★★★★★</div>
+                        <div class="pharmacy-badge">De garde</div>
+                        <div class="pharmacy-name">Pharmacie Étoile</div>
+                        <div class="pharmacy-hours">Ouverte • Ferme à 22h</div>
+                        <div class="pharmacy-location">Cotonou - Zogbo</div>
+                        <button class="pharmacy-btn">Voir les détails →</button>
+                    </div>
+                </div>
+                <div class="pharmacy-card">
+                    <div class="pharmacy-image"></div>
+                    <div class="pharmacy-info">
+                        <div class="pharmacy-rating">★★★★★</div>
+                        <div class="pharmacy-badge">De garde</div>
+                        <div class="pharmacy-name">Pharmacie Étoile</div>
+                        <div class="pharmacy-hours">Ouverte • Ferme à 22h</div>
+                        <div class="pharmacy-location">Cotonou - Zogbo</div>
+                        <button class="pharmacy-btn">Voir les détails →</button>
+                    </div>
+                </div>
+                <div class="pharmacy-card">
+                    <div class="pharmacy-image"></div>
+                    <div class="pharmacy-info">
+                        <div class="pharmacy-rating">★★★★★</div>
+                        <div class="pharmacy-badge">De garde</div>
+                        <div class="pharmacy-name">Pharmacie Étoile</div>
+                        <div class="pharmacy-hours">Ouverte • Ferme à 22h</div>
+                        <div class="pharmacy-location">Cotonou - Zogbo</div>
+                        <button class="pharmacy-btn">Voir les détails →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
     @endif
-    --}}
-</div>
+
 @endsection

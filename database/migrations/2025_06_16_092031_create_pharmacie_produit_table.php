@@ -14,8 +14,11 @@ return new class extends Migration
         Schema::create('pharmacie_produit', function (Blueprint $table) {
             $table->unsignedBigInteger('pharmacie_id');
             $table->unsignedBigInteger('produit_id');
+            $table->decimal('price', 10, 2);
             $table->enum('status',['available','unavailable']);
             $table->text('comment')->nullable();
+            // récemment ajouté 
+            $table->integer('quantity');
             $table->timestamps();
             $table->primary(['pharmacie_id', 'produit_id']);
             $table->foreign('pharmacie_id')->references('id')->on('pharmacies')->onDelete('cascade');

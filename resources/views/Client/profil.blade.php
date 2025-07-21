@@ -1,211 +1,116 @@
-@extends('layouts.app')
+@extends('layouts.accueil')
 
 @section('title', 'Mon Profil - PharmFind')
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/profil.css') }}?v={{ time() }}">
-<style>
-    /* Styles temporaires pour garantir un affichage de base */
-    .profil-container {
-        background: white;
-        max-width: 700px;
-        margin: 40px auto;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    .page-title {
-        color: #1e3a8a;
-        font-size: 2rem;
-        margin-bottom: 30px;
-        text-align: center;
-        font-weight: 600;
-    }
-    .user-info-section {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        margin-bottom: 40px;
-        padding: 20px;
-        background-color: #e0f2f1;
-        border-radius: 8px;
-    }
-    .user-avatar .avatar-placeholder {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        background-color: #e0f2f1;
-        color: #4CAF50;
-        border: 3px solid white;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-    }
-    .menu-item {
-        padding: 20px;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-    }
-    .menu-item:hover {
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
-    }
-    .logout-btn {
-        color: #FF5722;
-        font-weight: 600;
-    }
-    .logout-btn:hover {
-        color: #d32f2f;
-    }
-    /* Style pour l'alerte intégrée */
-    .logout-alert {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-        text-align: center;
-    }
-    .logout-alert.show {
-        display: block;
-    }
-    .alert-buttons {
-        margin-top: 20px;
-    }
-    .alert-buttons button {
-        padding: 10px 20px;
-        margin: 0 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .alert-confirm {
-        background-color: #4CAF50;
-        color: white;
-    }
-    .alert-cancel {
-        background-color: #f44336;
-        color: white;
-    }
-</style>
-@endpush
-
 @section('content')
-<div class="profil-container">
-    <h1 class="page-title">Mon Profil</h1>
-    
-    <div class="profil-card">
-        <div class="user-info-section">
-            <div class="user-avatar">
+<div class="container" style="max-width: 700px; margin: 40px auto;">
+    <div class="card shadow p-4">
+        <div class="d-flex align-items-center mb-4">
+            <div>
+                @php
+
+                $client =App\Models\Client::where('user_id', Auth::id())->first();
+                @endphp
                 @if(!empty($user->avatar))
-                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar de {{ $user->nom }}">
+                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" class="rounded-circle" style="width: 90px; height: 90px; object-fit: cover;">
                 @else
-                    <div class="avatar-placeholder">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 90px; height: 90px; font-size: 2.5rem; color: #4CAF50;">
                         <i class="fas fa-user"></i>
                     </div>
                 @endif
             </div>
-            
-            <div class="user-details">
-                <h2 class="user-name">{{ $user->nom ?? 'Nom non défini' }}</h2>
-                <p class="user-email">{{ $user->email }}</p>
-                @if(!empty($user->telephone))
-                    <p class="user-phone"><i class="fas fa-phone"></i> {{ $user->telephone }}</p>
+            <div class="ms-4">
+                <h2 class="mb-1">{{ $user->name ?? 'Nom non défini' }}</h2>
+                <p class="mb-1 text-muted">{{ $user->email }}</p>
+                <h2 class="mb-1">{{ $client->user->birth_date }}</h2>
+                <p class="mb-1 text-muted">{{ $user->address }}</p>
+                @if(!empty($user->phone))
+                    <p class="mb-0"><i class="fas fa-phone"></i> {{ $user->phone }}</p>
                 @endif
             </div>
         </div>
-        
-        <div class="profil-menu">
-            <div class="menu-item">
-                <div class="menu-content">
-                    <div class="menu-icon">
-                        <i class="fas fa-user-edit"></i>
-                    </div>
-                    <div class="menu-text">
-                        <h3>Informations personnelles</h3>
-                        <p>Modifier vos données personnelles</p>
-                    </div>
-                </div>
-                <a href="{{ route('profiledit') }}" class="menu-action">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
+        <hr>
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfilModal">
+            Modifier mes informations
+        </button>
+
+
             </div>
-            
-            <div class="menu-item">
-                <div class="menu-content">
-                    <div class="menu-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div class="menu-text">
-                        <h3>Historique de recherche</h3>
-                        <p>Vos dernières recherches</p>
-                    </div>
-                </div>
-                @if(route('wel'))
-                <a href="{{ route('wel') }}" class="menu-action">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-                @endif
-            </div>
-            
-            <div class="menu-item logout-item">
-                <form action="{{ route('logout') }}" method="POST" id="logout-form" class="logout-form">
+            <div class="col-12 col-md-6">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="logout-btn">
-                        <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="fas fa-sign-out-alt me-2"></i> Se déconnecter
                     </button>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Alerte intégrée pour la déconnexion -->
-    <div id="logoutAlert" class="logout-alert">
-        <p>Êtes-vous sûr de vouloir vous déconnecter ?</p>
-        <div class="alert-buttons">
-            <button type="button" class="alert-confirm" id="confirmLogout">Oui</button>
-            <button type="button" class="alert-cancel" id="cancelLogout">Non</button>
+<div class="container" style="max-width: 700px; margin: 40px auto;">
+   
+
+        <!-- Modal Bootstrap -->
+        <div class="modal fade" id="editProfilModal" tabindex="-1" aria-labelledby="editProfilModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <!-- Formulaire modification profil -->
+<form action="{{ route('profilupdate') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
+    <!-- Nom -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nom</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Adresse email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+                </div>
+
+                <!-- Téléphone -->
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Téléphone</label>
+                    <input type="text" class="form-control" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" required>
+                </div>
+
+                <!-- Adresse -->
+                <div class="mb-3">
+                    <label for="address" class="form-label">Adresse</label>
+                    <input type="text" class="form-control" id="address" name="address" value="{{ old('address', $user->address) }}" required>
+                </div>
+
+                <!-- Avatar -->
+                <div class="mb-3">
+                    <label for="avatar" class="form-label">Photo de profil</label>
+                    <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*">
+                    @if($user->avatar)
+                        <img src="{{ asset('storage/' . $user->avatar) }}" alt="Avatar" style="width: 80px; margin-top: 10px;">
+                    @endif
+                </div>
+
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+</form>
+
+
+           
         </div>
     </div>
 </div>
+
 @endsection
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const menuItems = document.querySelectorAll('.menu-item');
-    menuItems.forEach((item, index) => {
-        item.style.animationDelay = `${index * 0.1}s`;
-        item.classList.add('fade-in');
-    });
-
-    const logoutForm = document.getElementById('logout-form');
-    const logoutAlert = document.getElementById('logoutAlert');
-    const confirmLogout = document.getElementById('confirmLogout');
-    const cancelLogout = document.getElementById('cancelLogout');
-
-    if (logoutForm) {
-        logoutForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            logoutAlert.classList.add('show');
-        });
-
-        confirmLogout.addEventListener('click', () => {
-            logoutForm.submit();
-        });
-
-        cancelLogout.addEventListener('click', () => {
-            logoutAlert.classList.remove('show');
-        });
-    }
-});
-</script>
-@endpush

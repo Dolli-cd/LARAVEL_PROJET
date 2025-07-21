@@ -27,8 +27,8 @@ class Reservation extends Model
     }
     // relation many to many 
     public function produits(){
-        return $this->belongsToMany(Produit::class)
-        ->withPivot('quantity')
+        return $this->belongsToMany(Produit::class, 'produit_reservation')
+        ->withPivot('quantity', 'prescription_file')
         ->withTimestamps();
     }
 

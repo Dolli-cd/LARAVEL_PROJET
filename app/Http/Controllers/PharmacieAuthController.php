@@ -5,25 +5,44 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Produit;
 use App\Models\Commande;
 use App\Models\Reservation;
-use App\Models\Notification;
+use App\Models\Geolocalisation;
+use App\Models\Pharmacie;
+use App\Notifications\ReservationCreated; // à créer avec artisan
+use App\Notifications\CommandeCreated; // à créer avec artisan
 
 class PharmacieAuthController extends Controller
 {
     public function dashboard()
     {
-        $user = auth()->user();
-        if (!$user) {
-            return redirect()->route('loginpharma')->withErrors(['auth' => 'Vous devez être connecté pour accéder à votre dashboard.']);
+        if (!Auth::check() || Auth::user()->role !== 'pharmacie') {
+            return redirect()->route('loginpharma');
         }
-        $data = [
-            'name' => $user->name,
-            'email' => $user->email,
-        ];
-        return view('pharmacie.dashboardpharma', compact('data'));
+        $pharmacie = Auth::user()->pharmacie;
+
+        $pendingReservations = $pharmacie->reservations()->where('status', 'pending')->count();
+        $confirmedReservations = $pharmacie->reservations()->where('status', 'confirmed')->count();
+        $rejectedReservations = $pharmacie->reservations()->where('status', 'rejected')->count();
+        $expiredReservations = $pharmacie->reservations()->where('status', 'expired')->count();
+        $totalProduits = $pharmacie->produits()->count();
+        $produitsDisponibles = $pharmacie->produits()->wherePivot('status', 'available')->count();
+        $produitsIndisponibles =$pharmacie->produits()->wherePivot('status', 'unavailable')->count();
+        $totalCommandes =$pharmacie->commandes()->count(); // à condition que tu aies cette relation
+
+        return view('pharmacie.dashboardpharma', compact(
+            'pendingReservations',
+            'confirmedReservations',
+            'rejectedReservations',
+            'expiredReservations',
+            'totalProduits',
+            'produitsDisponibles',
+            'produitsIndisponibles',
+            'totalCommandes'
+        ));
     }
     public function formsign()
      {
@@ -47,71 +66,25 @@ class PharmacieAuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $remember = $request->has('remember'); //  vérifier si la case "remember" est cochée
 
-        // Auth::attempt prend juste les identifiants, pas le remember dans le tableau
-        if (Auth::attempt($credentials, $remember)) {
-            $user = auth()->user();
-            if ($user->role=='pharmacie'){
+      
+        if (Auth::attempt($credentials)) {
+            if (Auth::user()->role === 'pharmacie') {
                 return redirect()->route('pharmacie.dashboard');
-            } else {
-                Auth::logout();
-                return back()->withErrors(['email' => 'Accès non autorisé pour ce rôle.']);
             }
+            return back()->withErrors(['email' => 'Accès non autorisé pour ce rôle.']);
         }
+            
         return back()->withErrors(['email' => 'Email ou mot de passe incorrect.']);
     }
-
-    public function index()
-    {
-        $pharmacie = auth()->user()->pharmacie;
-
-        $pendingReservations = $pharmacie->reservations()->where('status', 'en_attente')->count();
-        $confirmedReservations = $pharmacie->reservations()->where('status', 'acceptée')->count();
-        $rejectedReservations = $pharmacie->reservations()->where('status', 'refusée')->count();
-        $expiredReservations = $pharmacie->reservations()->where('status', 'expirée')->count();
-
-        $notifications = auth()->user()->notifications()->latest()->take(10)->get();
-
-        return view('pharmacie.dashboard', compact(
-            'pendingReservations',
-            'confirmedReservations',
-            'rejectedReservations',
-            'expiredReservations',
-            'notifications'
-        ));
-    }
-
+            
+   
     public function produits()
     {
-        $produits = auth()->user()->pharmacie->produits;
+        $produits = auth()->user()->pharmacie->produits()->orderBy('id','asc')->get();
         return view('pharmacie.produit', compact('produits'));
     }
-
-    public function commandes()
-    {
-        $commandes = auth()->user()->pharmacie->commandes;
-        return view('pharmacie.commandes.index', compact('commandes'));
-    }
-
-    public function reservations()
-    {
-        $reservations = auth()->user()->pharmacie->reservations;
-        return view('pharmacie.reservations.index', compact('reservations'));
-    }
-
-    public function notifications()
-    {
-        $notifications = auth()->user()->notifications()->latest()->get();
-        return view('pharmacie.notifications', compact('notifications'));
-    }
-
-    public function historique()
-    {
-        $history = auth()->user()->activityLogs()->latest()->get();
-        return view('pharmacie.historique', compact('history'));
-    }
-
+   
     public function acceptReservation($id)
     {
         $reservation = Reservation::findOrFail($id);
@@ -131,5 +104,54 @@ class PharmacieAuthController extends Controller
         }
         return redirect()->back()->with('error', 'Réservation refusée');
     }
+
+
+    public function historique()
+    {
+        $pharmacie = auth()->user()->pharmacie;
+        $commandes = $pharmacie->commandes()->with('client', 'produits')->latest()->paginate(10);
+        $reservations = $pharmacie->reservations()->with('client', 'produits')->latest()->paginate(10);
+        return view('pharmacie.historique', compact('commandes', 'reservations'));
+    }
+
+
+    public function notifications()
+    {
+        $pharmacie = auth()->user()->pharmacie;
+        $notifications = $pharmacie->notifications()->paginate(10);
+
+        // Marquer toutes les notifications comme lues
+        $pharmacie->unreadNotifications->markAsRead();
+
+        return view('pharmacie.notification', compact('notifications'));
+    }
+    
+    public function markAsRead($id)
+    {
+        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return back();
+    }
+
+    public function commandes()
+    {
+        $pharmacie = auth()->user()->pharmacie;
+        $commandes = $pharmacie->commandes()->with(['client', 'produits'])->where('status','pending')->latest()->paginate(10);
+        return view('pharmacie.commande', compact('commandes'));
+    }
+
+
+
+
+
+    public function reservations()
+    {
+        $pharmacie = auth()->user()->pharmacie;
+        $reservations = $pharmacie->reservations()->with(['client', 'produits'])->where('status', 'pending')->latest()->paginate(5);
+        return view('pharmacie.reservation', compact('reservations'));
+    }
+
+
+
 }
 

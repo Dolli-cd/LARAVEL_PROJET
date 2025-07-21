@@ -13,12 +13,19 @@ return new class extends Migration
     {
         Schema::create('produits', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('categorie_id')->constrained('categories')->onDelete('cascade');
             $table->string('name');
+            // le code doit être en int
             $table->string('code');
+            $table->string('file');
+            //mettre un attribut file.............
+            //est ce nécessaire puisque ça reviendrait à catégorie: compléments ou medicaments;;;;
             $table->string('type');
-            $table->string('price',10,2);
+            $table->boolean('prescription')->default(false);
+            $table->softDeletes(); // ajoute deleted_at nullable
             $table->timestamps();
         });
+        
     }
 
     /**

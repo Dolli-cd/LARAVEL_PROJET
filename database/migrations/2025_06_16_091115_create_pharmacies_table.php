@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('schedule');
             $table->string('guard_time');
             $table->string('insurance_name');
+            $table->boolean('online')->default('false');
+
+            // a metre un boolean pour checker leur disponibilité 
             $table->timestamps();
         });
     }

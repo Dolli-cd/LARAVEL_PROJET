@@ -9,7 +9,7 @@ class Geolocalisation extends Model
     protected $fillable=[
         'client_id',
         'pharmacie_id',
-        'quartier_id',
+        'arrondissement_id',
         'latitude',
         'longitude',
     ];
@@ -24,7 +24,7 @@ class Geolocalisation extends Model
     public function pharmacie(){
         return $this->belongsTo(Pharmacie::class);
     }
-    public function quartier(){
-        return $this->belongsTo(Quartier::class);
+    public function arrondissement(){
+        return $this->belongsTo(Arrondissement::class);
     }
 }

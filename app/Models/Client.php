@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon; // IMPORTANT importer la classe carbon
-class Client extends Model
+use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon; // IMPORTANT importer la classe carbon et pour instancier user avec extends qui est en dessous
+class Client extends User
 {
+    use Notifiable;
     protected $fillable=[
         'user_id',
         'birth_date',
@@ -49,19 +51,9 @@ class Client extends Model
     {
         return $this->hasMany(Commande::class);
     }
-    // il a plusieurs ordonnances
-    public function ordonnances()
-    {
-        return $this->hasMany(Ordonnance::class);
-    }
-    public function paiements()
-    {
-        return $this->hasMany(Paiement::class);
-    }
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
+   
+   
+ 
 
      public function geolocalisation(){
         return $this->hasOne(Geolocalisation::class);

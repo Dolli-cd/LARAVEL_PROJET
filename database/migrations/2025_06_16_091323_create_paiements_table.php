@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('paiements', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
-            $table->foreignId('pharmacie_id')->constrained('pharmacies')->onDelete('cascade');
-            $table->foreignId('commande_id')->constrained('commandes')->onDelete('cascade');
-            $table->foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
+            $table->id();//pas besoin de client et pharmacie car un payement est pour une commande et une réservation sinon client et pharmacie seront redondant
+            // certains peuvent être nul
+            $table->foreignId('commande_id')->nullable()->constrained('commandes')->onDelete('cascade');
+            $table->foreignId('reservation_id')->nullable()->constrained('reservations')->onDelete('cascade');
             $table->decimal('amount');
             $table->string('type');
             $table->datetime('payment_date')->nullable();

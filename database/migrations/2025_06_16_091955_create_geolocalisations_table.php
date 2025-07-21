@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('geolocalisations', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('pharmacie_id')->constrained('pharmacies')->onDelete('cascade');
-            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
+            $table->decimal('latitude', 10, 7)->default(0);
+            $table->decimal('longitude', 10, 7)->default(0);
+//j'ai ajouté le nullable après 
+            $table->foreignId('pharmacie_id')->nullable()->constrained('pharmacies')->onDelete('cascade');
+            $table->foreignId('client_id')->nullable()->constrained('clients')->onDelete('cascade');
 
             // 🔧 Si tu veux 'on delete set null', il faut utiliser unsignedBigInteger + foreign
-            $table->unsignedBigInteger('quartier_id')->nullable();
-            $table->foreign('quartier_id')->references('id')->on('quartiers')->onDelete('set null');
-
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
+            $table->unsignedBigInteger('arrondissement_id')->nullable();
+            $table->foreign('arrondissement_id')->references('id')->on('arrondissements')->onDelete('set null');
+// longitude et  latitude en anglais sinon comme client est rattaché à commande, produit et réservation dans payement est ce qu'on a besoin de ça et aussi dans le formulaire de pharmacie on doit avoir alors commune,département.....
+            
 
             $table->timestamps();
         });
