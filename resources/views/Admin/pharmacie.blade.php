@@ -269,7 +269,7 @@
 
                 fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(fullAddress), {
                     headers: {
-                        'User-Agent': 'PharmFind/1.0 (abriellebandeira@gmail.com)'
+                        'User-Agent': '/1.0 (abriellebandeira@gmail.com)'
                     }
                 })
                 .then(response => response.json())

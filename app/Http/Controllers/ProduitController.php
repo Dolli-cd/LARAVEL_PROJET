@@ -60,7 +60,7 @@ class ProduitController extends Controller
 
         return view('pharmacie.search', compact('produits'))->render();
     }
-
+    
     // Ajout de produit + liaison avec la pharmacie et champs pivot
     public function ajouter_pro_traitement(Request $request)
     {

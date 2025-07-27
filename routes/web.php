@@ -69,6 +69,9 @@ Route::get('/paiement/reservation/{id}', [PaiementController::class, 'payerReser
 Route::get('/paiement/commande/{id}', [PaiementController::class, 'payerCommande'])->name('commande.paiement');
 
 //pas encore gérer
+Route::get('/qui-sommes-nous', function() {
+    return view ('layouts.sommes nous');
+})->name('quiSommesNous');
 Route::post('/panier/ajouter', [PanierController::class, 'ajouter'])->name('panier.ajouter');
 Route::post('/panier/update/{id}', [PanierController::class, 'update'])->name('panier.update');
 Route::get('/panier', [PanierController::class, 'afficher'])->name('panier');
@@ -79,7 +82,7 @@ Route::post('inscription',[ClientAuthController::class,'signup' ])->name('regist
 Route::get('login',[ClientAuthController::class, 'formlogin'])->name('login');
 Route::post('loginin',[ClientAuthController::class, 'login'])->name('loginin');
 Route::post('/déconnexion', [ClientAuthController::class, 'logout'])->name('logout');
-
+Route::get('/suggestions', [ClientAuthController::class, 'suggestions'])->name('suggestions');
 //Géolocalisation
 Route::get('/api/communes/{departement}', [Geolocalisation::class, 'getCommunes']);
 Route::get('/api/arrondissements/{commune}', [Geolocalisation::class, 'getArrondissements']);

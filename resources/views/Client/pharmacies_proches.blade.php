@@ -13,7 +13,7 @@
                         @if($pharmacie->user_avatar)
                             <img src="{{ asset('storage/' . $pharmacie->user_avatar) }}" alt="Logo pharmacie" style="width: 100%; height: 100%; object-fit: cover;">
                         @else
-                            <img src="{{ asset('img/default-avatar.png') }}" alt="Logo pharmacie" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="{{ asset('img/default-avatar.png') }}" alt="Logo pharmacie" style="width: 100%; height: 100%; object-fit: contain; background: #f5f5f5;">
                         @endif
                     </div>
                     <div class="card-body">

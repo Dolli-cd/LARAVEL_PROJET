@@ -8,4 +8,6 @@
             {{-- ... tes résultats ici ... --}}
         </div>
     </div>
+    
+    
 @endsection

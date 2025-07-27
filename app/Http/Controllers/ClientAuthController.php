@@ -75,7 +75,7 @@ class ClientAuthController extends Controller
                             });
                     });
                 })
-                ->paginate(8);
+                ->paginate(8, ['*'], 'produits_page');;
         }
 
         if ($type === 'pharmacie' || !$type) {
@@ -90,7 +90,7 @@ class ClientAuthController extends Controller
                     ->orWhere('schedule', 'ILIKE', "%{$query}%")
                     ->orWhere('online', 'ILIKE', "%{$query}%");
                 })
-                ->paginate(10);
+                ->paginate(8, ['*'], 'pharmacies_page');
         }
 
         return view('client.search', [
@@ -100,7 +100,89 @@ class ClientAuthController extends Controller
             'type' => $type,
             
         ]);
+
     }
+    public function suggestions(Request $request)
+    {
+        $search = $request->input('search');
+        $type = $request->input('type');
+        $results = collect();
+
+        if ($type === 'produit') {
+            $produits = \App\Models\Produit::with(['pharmacies' => function($q) {
+                $q->withPivot('price');
+            }])
+            ->where('name', 'ILIKE', "%{$search}%")
+            ->limit(5)
+            ->get()
+            ->map(function($produit) {
+                $price = $produit->pharmacies->first()?->pivot?->price ?? null;
+                return [
+                    'type' => 'produit',
+                    'name' => $produit->name,
+                    'file' => $produit->file ? asset('storage/' . $produit->file) : asset('img/default-product.png'),
+                    
+                ];
+            });
+            $results = $produits;
+        } elseif ($type === 'pharmacie') {
+            // Suggestions de pharmacies avec avatar
+            $pharmacies = \App\Models\Pharmacie::with('user')
+                ->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'ILIKE', "%{$search}%")
+                      ->orWhere('address', 'ILIKE', "%{$search}%")
+                      ->orWhere('guard_time', 'ILIKE', "%{$search}%");
+                })
+                ->limit(5)
+                ->get()
+                ->map(function($pharmacie) {
+                    return [
+                        'type' => 'pharmacie',
+                        'name' => $pharmacie->user->name . ' (' . $pharmacie->guard_time . ')',
+                        'avatar' => $pharmacie->user->avatar ? asset('storage/' . $pharmacie->user->avatar) : asset('img/default-avatar.png'),
+                    ];
+                });
+            $results = $pharmacies;
+        } else {
+            // Suggestions mixtes
+            $produits = \App\Models\Produit::with(['pharmacies' => function($q) {
+                $q->withPivot('price');
+            }])
+            ->where('name', 'ILIKE', "%{$search}%")
+            ->limit(5)
+            ->get()
+            ->map(function($produit) {
+                $price = $produit->pharmacies->first()?->pivot?->price ?? null;
+                return [
+                    'type' => 'produit',
+                    'name' => $produit->name,
+                    'file' => $produit->file ? asset('storage/' . $produit->file) : asset('img/default-product.png'),
+                    'price' => $price,
+                ];
+            });
+
+            $pharmacies = \App\Models\Pharmacie::with('user')
+                ->whereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'ILIKE', "%{$search}%")
+                      ->orWhere('address', 'ILIKE', "%{$search}%")
+                      ->orWhere('guard_time', 'ILIKE', "%{$search}%");
+                })
+                ->limit(5)
+                ->get()
+                ->map(function($pharmacie) {
+                    return [
+                        'type' => 'pharmacie',
+                        'name' => $pharmacie->user->name . ' (' . $pharmacie->guard_time . ')',
+                        'avatar' => $pharmacie->user->avatar ? asset('storage/' . $pharmacie->user->avatar) : asset('img/default-avatar.png'),
+                    ];
+                });
+
+            $results = $produits->concat($pharmacies);
+        }
+
+        return response()->json($results->values());
+    }
+
     public function show($id, $pharmacie_id)
     {
         $produit = Produit::with(['pharmacies' => function ($query) use ($pharmacie_id) {
@@ -144,7 +226,11 @@ class ClientAuthController extends Controller
             ->when($category, function ($q) use ($category) {
                 $q->where('categorie_id', $category);
             })
-            ->paginate(12);
+            ->paginate(8);
+            foreach ($produits as $produit) {
+                $produit->setRelation('pivot', $produit->pharmacies->first()->pivot ?? null);
+            }
+            
         
         return view('client.pharmacie-produits', compact('pharmacie', 'produits', 'query'));
     }

@@ -1,4 +1,4 @@
-# 🛒 Système de Rappel de Panier - PharmFind
+# 🛒 Système de Rappel de Panier - PharmaFind
 
 ## 📋 Description
 
@@ -20,8 +20,8 @@ Dans votre fichier `.env`, configurez l'envoi d'emails :
 
 ```env
 MAIL_MAILER=log
-MAIL_FROM_ADDRESS=noreply@pharmfind.com
-MAIL_FROM_NAME="PharmFind"
+MAIL_FROM_ADDRESS=noreply@PharmaFind.com
+MAIL_FROM_NAME="PharmaFind"
 ```
 
 Pour la production, utilisez SMTP :

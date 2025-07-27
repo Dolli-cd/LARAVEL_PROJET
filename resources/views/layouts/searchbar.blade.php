@@ -28,8 +28,21 @@
     }
 @endphp
 
+<style>
+    /*suggestions */
+#suggestions .list-group-item:hover{
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+#suggestions{
+    border-radius: 0.5rem;
+    overflow:hidden;
+}
+</style>
+
 <div class="search-container flex-grow-1 mx-3">
-    <form action="{{ $searchRoute }}" method="GET" class="search-wrapper">
+    <form action="{{ $searchRoute }}" method="GET" class="search-wrapper" style="position: relative;">
         @if($type !== 'pharmacie')
             <span class="search-select-wrapper">
                 @php
@@ -49,6 +62,9 @@
         @if($type)
             <input type="hidden" name="type" value="{{ $type }}">
         @endif
+      
         <button class="search-btn" tabindex="-1"><i class="fas fa-search"></i></button>
     </form>
+    <ul id="suggestions" class="list-group position-absolute w-100" style="z-index:1000; display:none;"></ul>
+   
 </div>

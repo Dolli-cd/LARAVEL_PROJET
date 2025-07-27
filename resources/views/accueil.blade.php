@@ -1,13 +1,14 @@
     @extends('layouts.accueil')
    @section('title','accueil')
    @section('content')
-    <section class="hero">
-        <div class="container">
+    <section class="hero" >
+        <div data-aos="fade-up" class="container">
             <h1>Trouvez votre pharmacie,<br>en un instant.</h1>
-            <p>Localicsez une pharmacie, vérifiez vos médicaments
+            <p>Localisez une pharmacie, vérifiez vos médicaments
 et réservez en toute simplicité où que vous soyez.</p>
-            <div class="hero-buttons">
+            <div data-aos="fade-right" class="hero-buttons">
                 <a href="{{ route('client.search', ['type' => 'pharmacie']) }}" class="btn btn-yellow">Trouver une pharmacie</a>
+                
                 <a href="{{ route('client.search', ['type' => 'produit']) }}" class="btn btn-outline" style="background: white;"><span>Chercher un médicament</span><span class="arrow"></span></a>
             </div>
         </div>
@@ -21,7 +22,7 @@ et réservez en toute simplicité où que vous soyez.</p>
 @endif
 @if (!Auth::check() ||  Auth::user()->role==='client')
 
-    <section class="section">
+    <section class="section" >
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Prenez soin de vous</h2>
@@ -29,7 +30,7 @@ et réservez en toute simplicité où que vous soyez.</p>
             <div class="position-relative carrousel-section my-4">
                 <div class="carrousel-scroll d-flex flex-nowrap overflow-auto" style="scroll-behavior: smooth;">
                 @forelse($produits as $produit)
-                    <div class="carrousel-card flex-shrink-0" style="width: 220px; margin-right:16px;">
+                    <div class="carrousel-card  flex-shrink-0" data-aos="fade-up" data-aos-delay="{{$loop->index *50}}" style="width: 220px; margin-right:16px;">
                         <div class="product-image">
                         @if($produit->file)
                        <img src="{{ asset('storage/' . $produit->file) }}" alt="{{ $produit->name }}" style="width: 100%; height: 100%; object-fit: contain;">
@@ -38,7 +39,7 @@ et réservez en toute simplicité où que vous soyez.</p>
                         @endif
                         </div>
                         <div class="product-info">
-                            <div class="product-pharmacy">
+                            <div class="product-pharmacy" >
                                 @if($produit->pharmacies->count())
                                     {{ $produit->pharmacies->first()->user->name ?? 'Pharmacie inconnue' }}
                                 @else
@@ -116,7 +117,7 @@ et réservez en toute simplicité où que vous soyez.</p>
             <div class="position-relative carrousel-section">
                 <div class="carrousel-scroll d-flex flex-nowrap overflow-auto" style="scroll-behavior: smooth;">
                     @foreach($pharmacies as $pharmacie)
-                        <div class="pharmacy-card flex-shrink-0" style="width: 270px; margin-right: 16px;">
+                        <div class="pharmacy-card flex-shrink-0" data-aos="fade-down" data-aos-delay="{{$loop->index *50}}" style="width: 270px; margin-right: 16px;">
                             <div class="pharmacy-image" style="width: 100%; aspect-ratio:1/1;  overflow: hidden; background: #f5f5f5; display:flex, align-items: center; justify-content: center">
                                 @if($pharmacie->user && $pharmacie->user->avatar)
                                     <img src="{{ asset('storage/' . $pharmacie->user->avatar) }}" alt="Logo pharmacie" style="width: 100%; height: 100%; object-fit: cover;">
@@ -154,7 +155,7 @@ et réservez en toute simplicité où que vous soyez.</p>
                                         @endif
                                     </div>
                                 @endif
-                             <a href="{{route('pharmacie.produits', $pharmacie->id)}}"> <button class="pharmacy-btn">Voir les détails →</button></a>
+                             <a href="{{route('pharmacie.produits', $pharmacie->id)}}"> <button class="pharmacy-btn">Visiter →</button></a>
                             </div>
                         </div>
                     @endforeach
@@ -171,55 +172,61 @@ et réservez en toute simplicité où que vous soyez.</p>
         </div>
     </section>
    @endif
-    <!-- Special Offer 
-    <section class="section special-offer">
-        <div class="container">
-            <div class="offer-content">
-                <div class="offer-text">
-                    <div class="offer-subtitle">Offre du Jour</div>
-                    <h2>Obtenez jusqu'à 30% de réduction<br>sur vos médicaments essentiels !</h2>
-                    <p class="offer-description">
-                        Prenez soin de votre santé sans vider votre porte-monnaie. Profitez de remises exclusives sur une 
-                        sélection de traitements courants disponibles dans les pharmacies proches de chez vous. 
-                        Faites le bon choix pour votre bien-être et votre budget.
-                    </p>
-                    <a href="#" class="btn btn-primary">Commandez dès maintenant →</a>
-                </div>
-                <div class="offer-image">
-                    <img src="https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg?auto=compress&cs=tinysrgb&w=500" alt="Médicaments">
-                </div>
-            </div>
+   <footer class="footer">
+    <div class=" product-footer">
+        <div style="margin-bottom: 10px; margin-top: 10px;">
+            <span class="logo" style="display: flex; flex-direction: column; align-items: center;">
+                <i class="fas fa-pills" style="font-size: 30px; margin-bottom: 5px;"></i>
+                <span style="font-size: 1.2rem; font-weight: 500;">PharmaFind</span>              
+            </span>
         </div>
-    </section>-->
+        <a href="/qui-sommes-nous" style="font-size: 1rem; font-weight: 500; margin-bottom: 5px; color: #fff; text-decoration: none;">Qui sommes-nous?</a>
+        <a href="tel:+2290199017260" style="color: inherit; text-decoration: none;">
+            <div class="contact-item" style="font-size: 1rem; margin-bottom: 5px;">
+                <span>📞</span>
+                <span>+229 01 99 01 72 60</span>
+            </div>
+        </a>
+        <a href="malito:contactpharmaFind.com" style="color:inherit; text-decoration:none;"><div style="font-size: 1rem;">
+            <span>📧</span>
+            <span>contact@pharmaFind.com</span>
+        </div> </a>
+    </div>
+</footer>
     @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    Swal.fire({
-        title: 'Voir les pharmacies proches de vous ?',
-        text: "Pour obtenir les pharmacies les plus proches, autorisez l'application à utiliser votre position exacte.",
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'Utiliser la position exacte',
-        cancelButtonText: 'Pas maintenant',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                // Ici, tu as la latitude et la longitude du client
-                let lat = position.coords.latitude;
-                let lng = position.coords.longitude;
-                // Envoie ces coordonnées à Laravel (AJAX ou redirection GET)
-                window.location.href = `/pharmacies/proximite?lat=${lat}&lng=${lng}`;
-            }, function(error) {
-                Swal.fire('Erreur', 'Impossible d\'obtenir la position.', 'error');
-                // Affiche le formulaire de recherche par zone si besoin
-                document.getElementById('formulaire-zone').style.display = 'block';
+    const geoBtn = document.getElementById('geo-btn');
+    if (geoBtn) {
+        geoBtn.addEventListener('click', function() {
+            Swal.fire({
+                title: 'Voir les pharmacies proches de vous ?',
+                text: "Pour obtenir les pharmacies les plus proches, autorisez l'application à utiliser votre position exacte.",
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Utiliser la position exacte',
+                cancelButtonText: 'Pas maintenant',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        let lat = position.coords.latitude;
+                        let lng = position.coords.longitude;
+                        window.location.href = `/pharmacies/proximite?lat=${lat}&lng=${lng}`;
+                    }, function(error) {
+                        Swal.fire('Erreur', 'Impossible d\'obtenir la position.', 'error');
+                        // Optionnel : afficher le formulaire de recherche par zone
+                        const formZone = document.getElementById('formulaire-zone');
+                        if (formZone) formZone.style.display = 'block';
+                    });
+                } else {
+                    // Optionnel : afficher le formulaire de recherche par zone
+                    const formZone = document.getElementById('formulaire-zone');
+                    if (formZone) formZone.style.display = 'block';
+                }
             });
-        } else {
-            // Affiche le formulaire de recherche par zone
-            document.getElementById('formulaire-zone').style.display = 'block';
-        }
-    });
+        });
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -53,7 +53,7 @@ class CartReminderNotification extends Notification
             ->line('Total de votre panier : ' . number_format($totalPrice, 0, ',', ' ') . ' FCFA')
             ->action('Voir mon panier', url('/panier'))
             ->line('Ces produits pourraient ne plus être disponibles demain.')
-            ->salutation('Cordialement, l\'équipe PharmFind');
+            ->salutation('Cordialement, l\'équipe PharmaFind');
     }
 
     /**

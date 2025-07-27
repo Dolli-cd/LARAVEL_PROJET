@@ -132,7 +132,7 @@ class AdminAuthController extends Controller
         // Appel à Nominatim pour latitude/longitude
         try {
             $response = \Illuminate\Support\Facades\Http::withHeaders([
-                'User-Agent' => 'PharmFind/1.0 (abriellebandeira@gmail.com)' // Remplace par ton vrai nom d'app/email
+                'User-Agent' => 'PharmaFind/1.0 (abriellebandeira@gmail.com)' // Remplace par ton vrai nom d'app/email
             ])->get('https://nominatim.openstreetmap.org/search', [
                 'format' => 'json',
                 'q' => $adresse_complete,

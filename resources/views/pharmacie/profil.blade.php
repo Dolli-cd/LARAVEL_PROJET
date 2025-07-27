@@ -1,6 +1,6 @@
 @extends('layouts.accueil')
 
-@section('title', 'Mon Profil - PharmFind')
+@section('title', 'Mon Profil - PharmaFind')
 
 @section('content')
 <div class="container" style="max-width: 700px; margin: 40px auto;">

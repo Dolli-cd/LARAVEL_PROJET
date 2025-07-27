@@ -35,7 +35,7 @@ class PanierController extends Controller
                 "pharmacie" => $pharmacie->user->name ?? 'Pharmacie inconnue',
                 "file" => $produit->file,
                 "id" => $produit->id,
-                "pharmacie_id" => $pharmacie->id, // Ajout explicite de pharmacie_id
+                "pharmacie_id" => $pharmacie->id, 
             ];
 
             session()->put('panier_' . $userId, $panier);
